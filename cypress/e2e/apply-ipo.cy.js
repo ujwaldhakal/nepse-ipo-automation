@@ -1,3 +1,5 @@
+const { share } = require("rxjs");
+
 describe('Login Test', () => {
     it('Should apply IPO ', () => {
       // Visit the login page
@@ -24,11 +26,17 @@ describe('Login Test', () => {
 
   function applyIpo(el) 
   {
-    let shareType = el.find('.isin').text();
-    if(shareType === 'Ordinary Shares') 
+    let shareType = el.find('.isin').text().replace(/ /g,'').replace(/(\r\n|\n|\r)/gm, "");
+    if(shareType == 'OrdinaryShares') 
     {
       
-        el.find('.btn-issue').click(); // apply
+      let applyButton = el.find('.btn-issue:contains("Apply")');
+      
+        if(applyButton.length ==0 ) {
+        console.log("share already applied for ",el.find('.company-name').text())
+        return;
+        }
+        el.find('.btn-issue:contains("Apply")').click(); // apply
         cy.wait(1000);
         cy.get('#selectBank').select(Cypress.env('bank_name_to_apply_ipo')); 
         cy.get('#appliedKitta').type(Cypress.env('number_of_kitta'))
